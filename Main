@@ -1,0 +1,228 @@
+#include<iostream>
+#include<string>
+#include<chrono>
+#include<thread>
+#define MAX 1000
+
+void showmenu(); //菜单
+void inputstudent(struct Student*, int&); //输入函数
+void printstudent(struct Student*, int); //输出函数
+void foundstudent(struct Student*, int); //查找函数
+void destudent(struct Student*, int&); //删除一个学生信息
+void deall(struct Student*, int&); //删除所有信息函数
+void clearconsole(); //清屏
+
+struct Student
+{
+	std::string name = "";
+	int ID = 0;
+	double score = 0;
+};
+
+int main()
+{
+	int count = 0; //计数
+	int incount = 0; //选择
+	Student* s1 = new Student [MAX];
+	while (1) {
+		showmenu();
+		std::cin >> incount;
+		switch (incount)
+		{
+		case 1: //输入学生信息
+			if (count >= MAX)
+			{
+				std::cout << "已经到达系统最大可容纳学生数量" << std::endl;
+				clearconsole();
+				break;
+			}
+			inputstudent(s1, count);
+			clearconsole();
+			break;
+		case 2: //输出学生信息
+			if (count == 0)
+			{
+				std::cout << "未存储任何学生的信息" << std::endl;
+				clearconsole();
+				break;
+			}
+			printstudent(s1, count);
+			clearconsole();
+			break;
+		case 3: //查询学生信息
+			if (count == 0)
+			{
+				std::cout << "未存储任何学生的信息" << std::endl;
+				clearconsole();
+				break;
+			}
+			foundstudent(s1, count);
+			clearconsole();
+			break;
+		case 4: //删除学生信息
+			if (count == 0)
+			{
+				std::cout << "未存储任何学生的信息" << std::endl;
+				clearconsole();
+				break;
+			}
+			destudent(s1, count);
+			clearconsole();
+			break;
+		case 5: //删除所有信息
+			deall(s1, count);
+			clearconsole();
+			break;
+		case 0: //退出学生系统
+			std::cout << "欢迎下次使用" << std::endl;
+			delete[] s1;
+			return 0;
+		default:
+			std::cout << "输入的功能不在使用范围，请重新输入" << std::endl;
+			clearconsole();
+			break;
+		}
+	std::this_thread::sleep_for(std::chrono::milliseconds(1)); //等同于c语言的Sleep(1)，防止死循环
+	}
+	
+	return 0;
+}
+
+void showmenu()
+{
+	std::cout << "--------------------------" << std::endl;
+	std::cout << "    1、输入学生信息		" << std::endl;
+	std::cout << "    2、输出学生信息		" << std::endl;
+	std::cout << "    3、查询学生信息		" << std::endl;
+	std::cout << "    4、删除学生信息		" << std::endl;
+	std::cout << "    5、删除所有信息		" << std::endl;
+	std::cout << "    0、退出学生系统		" << std::endl;
+	std::cout << "--------------------------" << std::endl;
+}
+
+void inputstudent(struct Student * s1, int& count)
+{
+	std::cout << "输入学生的姓名：" << std::endl;
+	std::cin >> s1[count].name;
+	std::cout << "输入学生的ID：" << std::endl;
+	std::cin >> s1[count].ID;
+	std::cout << "输入学生的分数：" << std::endl;
+	std::cin >> s1[count].score;
+	count++;
+}
+
+void printstudent(struct Student * s1, int count)
+{
+	for (int i = 0; i < count; i++)
+	{
+		std::cout << "第" << i + 1 << "名学生的信息" << std::endl;
+		std::cout << "学生的姓名： " << s1[i].name << std::endl;
+		std::cout << "学生的ID： " << s1[i].ID << std::endl;
+		std::cout << "学生的分数： " << s1[i].score << std::endl;
+		std::cout << std::endl;
+	}
+}
+
+void foundstudent(struct Student* s1, int count) //v1输入查找数
+{
+	std::string v1;
+	std::cout << "输入学生的姓名查找：";
+	std::cin >> v1;
+	bool f1 = false;
+	for (int i = 0; i <= count; i++)
+	{
+		if (v1 == s1[i].name)
+		{
+			std::cout << "该学生的信息为：" << std::endl;
+			std::cout << "学生的姓名： " << s1[i].name << std::endl;
+			std::cout << "学生的ID： " << s1[i].ID << std::endl;
+			std::cout << "学生的分数： " << s1[i].score << std::endl;
+			f1 = true;
+			break;
+		}
+	}
+	if (!f1)
+	{
+		std::cout << "没有查找到该学生" << std::endl;
+	}
+}
+
+void destudent(struct Student* s1, int& count)
+{
+	int index = -1;
+	std::string v2;
+	std::cout << "输入学生的姓名删除：";
+	std::cin >> v2;
+
+	for (int i = 0; i <= count; i++)
+	{
+		if (v2 == s1[i].name)
+		{
+			index = i;
+			break;
+		}
+	}
+	if (index == -1)
+	{
+		std::cout << "没有查找到需要删除的学生" << std::endl;
+		return;
+	}
+
+
+	for (int j = index; j <= count - 1; j++)
+	{
+		s1[j] = s1[j + 1];
+	}
+	s1[count].name = "";
+	s1[count].ID = 0;
+	s1[count].score = 0.0;
+	count--;
+	std::cout << "学生" << v2 << "已删除" << std::endl;
+}
+
+void deall(struct Student* s1, int& count)
+{
+	std::string comfirm = "";
+	if (count == 0)
+	{
+		std::cout << "没有存储学生信息" << std::endl;
+		return;
+	}
+	else
+	{
+		std::cout << "你确定要删除所有信息吗？" << std::endl;
+		std::cout << "是请输入yes，否请输入no" << std::endl;
+		std::cin >> comfirm;
+		if (comfirm == "yes")
+		{
+			for (int i = 0; i < count; i++)
+			{
+				s1[i].name = "";
+				s1[i].ID = 0;
+				s1[i].score = 0.0;
+			}
+			count = 0;
+			std::cout << "所有信息已删除\n" << std::endl;
+			return;
+		}
+		else
+		{
+			std::cout << "操作已取消" << std::endl;
+		}
+	}
+}
+
+void clearconsole()
+{
+	getchar();
+	std::cout << "\n按回车键继续..." << std::endl;
+	while (1)
+	{
+		if (std::cin.get() == '\n')
+		{
+			system("cls");
+			break;
+		}
+
+	}
+}
